@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>أرثن الفرخ</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      background: #000;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* شاشة التحميل */
+    .loader-screen {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at top, #111 0, #000 55%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 40px;
+      z-index: 999;
+    }
+
+    .eyes {
+      display: flex;
+      gap: 40px;
+    }
+
+    .eye {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: #050505;
+      position: relative;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+    }
+
+    .eye::before {
+      content: "";
+      position: absolute;
+      top: 18px;
+      left: 22px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #fff 0, #999 30%, #000 65%);
+      box-shadow: 0 0 10px rgba(255,255,255,0.5);
+    }
+
+    .eyelid {
+      position: absolute;
+      inset: 0;
+      background: #000;
+      animation: blink 4s infinite;
+      transform-origin: top;
+    }
+
+    .eyelid:nth-child(2) {
+      animation-delay: 1.2s;
+    }
+
+    @keyframes blink {
+      0%, 90%, 100% { transform: scaleY(0); }
+      92%, 96% { transform: scaleY(1); }
+    }
+
+    .loader-text {
+      font-size: 1.2rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #aaa;
+      position: relative;
+    }
+
+    .loader-text::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -4px;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, #ff0080, #8400ff);
+      animation: loadingBar 2s infinite;
+      transform-origin: left;
+    }
+
+    @keyframes loadingBar {
+      0% { transform: scaleX(0); opacity: 0.5; }
+      50% { transform: scaleX(1); opacity: 1; }
+      100% { transform: scaleX(0); opacity: 0.5; }
+    }
+
+    /* المحتوى الرئيسي */
+    .card {
+      width: min(500px, 95vw);
+      padding: 30px 24px;
+      border-radius: 24px;
+      background: radial-gradient(circle at top, #111 0, #050505 60%);
+      box-shadow: 0 0 40px rgba(255, 0, 128, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      text-align: center;
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .question {
+      font-size: 1.5rem;
+      margin-bottom: 25px;
+      line-height: 1.5;
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    button {
+      border: none;
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-size: 1rem;
+      cursor: pointer;
+      min-width: 120px;
+      background: linear-gradient(135deg, #ff0080, #6600ff);
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.15s ease-out, box-shadow 0.15s ease-out, background 0.15s;
+    }
+
+    button::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top, rgba(255,255,255,0.4), transparent 60%);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 15px rgba(255, 0, 128, 0.4);
+    }
+
+    button:active {
+      transform: translateY(1px) scale(0.97);
+      box-shadow: 0 0 5px rgba(255, 0, 128, 0.3);
+    }
+
+    button:hover::after {
+      opacity: 0.4;
+    }
+
+    /* الرسائل النهائية */
+    .big-message {
+      font-size: clamp(2.4rem, 7vw, 4rem);
+      font-weight: 800;
+      line-height: 1.4;
+      text-shadow: 0 0 25px rgba(255,0,128,0.4);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- شاشة التحميل -->
+  <div class="loader-screen" id="loader">
+    <div class="eyes">
+      <div class="eye">
+        <div class="eyelid"></div>
+      </div>
+      <div class="eye">
+        <div class="eyelid"></div>
+      </div>
+    </div>
+    <div class="loader-text">Loading...</div>
+  </div>
+
+  <!-- الكارت الرئيسي -->
+  <div class="card" id="content" class="hidden">
+    <!-- مرحلة 1: هل ارثن فرخ؟ -->
+    <div id="step1">
+      <div class="question">هل أرثن فرخ؟</div>
+      <div class="buttons">
+        <button onclick="fromYes()">نعم</button>
+        <button onclick="fromNo()">لا</button>
+      </div>
+    </div>
+
+    <!-- مرحلة 2 (من لا): ارثن فرخ كلش مو -->
+    <div id="stepNo1" class="hidden">
+      <div class="question">أرثن فرخ كلش مو؟</div>
+      <div class="buttons">
+        <button onclick="showFinal1()">اي اوف</button>
+        <button onclick="showFinal1()">اي اويلي علي</button>
+      </div>
+    </div>
+
+    <!-- مرحلة 2 (من نعم): و امه حلوه؟ -->
+    <div id="stepYes1" class="hidden">
+      <div class="question">وإمه حلوه؟</div>
+      <div class="buttons">
+        <button onclick="stepYes2()">اي على امه هو</button>
+        <button onclick="stepYes2()">ايي تخبل</button>
+      </div>
+    </div>
+
+    <!-- مرحلة 3 بعد امه: تريد تنيجه هوه وامه؟ -->
+    <div id="stepYes2" class="hidden">
+      <div class="question">تريد تنيجه هوه وإمه؟</div>
+      <div class="buttons">
+        <button onclick="showFinal2()">اي</button>
+        <button onclick="showFinal2()">اوف اي</button>
+      </div>
+    </div>
+
+    <!-- رسالة نهائية 1 -->
+    <div id="final1" class="hidden">
+      <div class="big-message">عفيه بلشطور نيج امه اله</div>
+    </div>
+
+    <!-- رسالة نهائية 2 -->
+    <div id="final2" class="hidden">
+      <div class="big-message">شطور نيجه ونيج لامه يلا</div>
+    </div>
+  </div>
+
+  <script>
+    // إظهار المحتوى بعد شاشة التحميل
+    window.addEventListener("load", () => {
+      setTimeout(() => {
+        document.getElementById("loader").classList.add("hidden");
+        document.getElementById("content").classList.remove("hidden");
+      }, 2300); // 2.3 ثانية فخامة
+    });
+
+    function hideAllSteps() {
+      ["step1", "stepNo1", "stepYes1", "stepYes2", "final1", "final2"].forEach(id => {
+        document.getElementById(id).classList.add("hidden");
+      });
+    }
+
+    function fromNo() {
+      hideAllSteps();
+      document.getElementById("stepNo1").classList.remove("hidden");
+    }
+
+    function fromYes() {
+      hideAllSteps();
+      document.getElementById("stepYes1").classList.remove("hidden");
+    }
+
+    function stepYes2() {
+      hideAllSteps();
+      document.getElementById("stepYes2").classList.remove("hidden");
+    }
+
+    function showFinal1() {
+      hideAllSteps();
+      document.getElementById("final1").classList.remove("hidden");
+    }
+
+    function showFinal2() {
+      hideAllSteps();
+      document.getElementById("final2").classList.remove("hidden");
+    }
+  </script>
+</body>
+</html>
